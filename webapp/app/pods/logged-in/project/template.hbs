@@ -1,37 +1,48 @@
-{{projects-header
-  session=session
-  project=project
-}}
+<div>
+  <ProjectsHeader @session={{this.session}} @project={{this.project}} />
+  <style>
+    html body {
+    {{{this.colors}}}
+    }
+    html[data-theme='dark'] body {
+    {{{this.darkColors}}}
+    }
+  </style>
 
-<div class="wrapper">
-  <div class="wrapper-sidebar">
-    {{#if model.loading}}
-      {{skeleton-ui/project-navigation}}
-    {{else if showError}}
-      {{skeleton-ui/project-navigation}}
-    {{else}}
-      {{project-navigation
-        project=project
-        permissions=permissions
-        revisions=revisions
-      }}
-    {{/if}}
-  </div>
-
-  <div class="wrapper-content">
-    {{#unless model.loading}}
-      {{phoenix-channel-listener project=project}}
+  <AccWrapper>
+    {{#unless this.showError}}
+      <AccWrapper::Sidebar>
+        {{#if this.model.loading}}
+          <SkeletonUi::ProjectNavigation />
+        {{else if this.showError}}
+          <SkeletonUi::ProjectNavigation />
+        {{else}}
+          <ProjectNavigation
+            @project={{this.project}}
+            @permissions={{this.permissions}}
+            @revisions={{this.revisions}}
+          />
+        {{/if}}
+      </AccWrapper::Sidebar>
     {{/unless}}
 
-    {{#if showError}}
-      {{error-section
-        status=(t 'pods.error.unauthorized.status')
-        title=(t 'pods.error.unauthorized.title')
-        text=(t 'pods.error.unauthorized.text')
-        isAuthenticated=false
-      }}
-    {{else}}
-      {{outlet}}
-    {{/if}}
-  </div>
+    <AccWrapper::Content>
+      {{#unless this.model.loading}}
+        <PhoenixChannelListener @project={{this.project}} />
+      {{/unless}}
+
+      {{#if this.showError}}
+        <ErrorSection
+          @status={{t "pods.error.unauthorized.status"}}
+          @title={{t "pods.error.unauthorized.title"}}
+          @text={{t "pods.error.unauthorized.text"}}
+          @isAuthenticated={{false}}
+        />
+      {{else}}
+        {{outlet}}
+      {{/if}}
+    </AccWrapper::Content>
+  </AccWrapper>
 </div>
+
+<ApplicationFooter />

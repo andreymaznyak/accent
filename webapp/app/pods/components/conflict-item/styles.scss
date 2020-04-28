@@ -1,27 +1,33 @@
-& {
-  transition: $transition-speed $transition-easing;
-  transition-property: background, border-color;
+.conflict-item {
+  transition: 0.2s ease-in-out;
+  transition-property: background, border-color, transform;
   padding: 10px;
   margin-bottom: 15px;
-  border-left: 2px solid transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
 
   &:nth-child(even) {
-    background: $color-light-grey;
+    background: var(--background-light);
   }
 
   &:focus,
   &:hover {
-    border-color: lighten($color-primary, 40%);
-    background: $color-light-grey;
+    border-color: var(--background-light-highlight);
+    background: var(--background-light);
   }
 
   &.active {
-    border-color: lighten($color-primary, 10%);
-    background: $color-light-grey;
+    background: var(--background-light);
+    border-color: var(--background-light-highlight);
+    transform: scale(1.02);
   }
 }
 
-&.fullscreen {
+.item-details__column {
+  position: relative;
+}
+
+.conflict-item.fullscreen {
   .item-details {
     display: flex;
     align-items: stretch;
@@ -39,34 +45,37 @@
   }
 }
 
-&[class*='resolved'] {
+.conflict-item.resolved {
   padding: 5px 10px;
   margin: 5px 0 15px;
-  background: lighten($color-primary, 48%);
-  border: 1px solid lighten($color-primary, 43%);
-  border-left: 2px solid $color-primary;
-  box-shadow: 0 1px 5px lighten($color-primary, 47%);
+  border: 1px solid var(--color-green);
+  background: hsl(
+    var(--color-green-hue),
+    var(--color-green-saturation),
+    var(--color-highlight-lighteness)
+  );
 
   .item-key-prefix {
-    color: rgba($color-primary, 0.7);
+    opacity: 0.7;
+    color: var(--color-green);
   }
 
   .item-key {
     font-size: 12px;
-    color: $color-primary;
+    color: var(--color-green);
   }
 }
 
-&[class*='errored'] {
+.conflict-item.errored {
   .textInput {
-    border-color: lighten($color-error, 30%);
+    border-color: var(--color-error);
   }
 }
 
 .error {
   font-size: 12px;
   font-weight: bold;
-  color: $color-error;
+  color: var(--color-error);
 }
 
 .item-key-prefix {
@@ -78,24 +87,19 @@
 
 .item-key {
   display: block;
-  @extend %translationKeyBase;
-  transition: $transition-speed $transition-easing;
+  font-family: var(--font-monospace);
+  word-break: break-all;
+  transition: 0.2s ease-in-out;
   transition-property: color;
   margin-right: 15px;
   line-height: 1.5;
   font-size: 12px;
   font-weight: bold;
+  color: var(--color-primary);
 }
 
 .key {
   text-decoration: none;
-
-  &:focus,
-  &:hover {
-    .item-key {
-      color: $color-primary;
-    }
-  }
 }
 
 .textResolved {
@@ -112,9 +116,11 @@
   font-size: 13px;
 }
 
-.uncorrectButton,
 .correctButton {
-  flex-shrink: 0;
+  position: absolute !important;
+  top: 6px !important;
+  right: 15px !important;
+  padding: 0 !important;
 }
 
 .textDiff,
@@ -122,67 +128,48 @@
 .conflictedText-textReference {
   padding: 8px 0;
   font-size: 13px;
-  color: darken($color-grey, 15%);
+  color: var(--color-grey);
 }
 
 .textDiff {
-  border-top: 1px dashed lighten($color-grey, 20%);
+  border-top: 1px dashed;
+  border-color: var(--background-light-highlight);
   white-space: pre-wrap;
-
-  .added {
-    padding: 0 3px;
-    background: lighten($color-success, 42%);
-    color: $color-success;
-  }
-
-  .removed {
-    padding: 0 3px;
-    background: lighten($color-error, 42%);
-    color: $color-error;
-  }
 }
 
 .textConflicted {
   font-size: 11px;
-  color: lighten($color-grey, 5%);
+  color: var(--color-grey);
 }
 
 .textConflicted-empty {
   font-size: 11px;
   font-style: italic;
-  color: lighten($color-grey, 10%);
+  color: var(--color-grey);
 }
 
 .textConflicted-content {
   white-space: pre-wrap;
 }
 
-.conflictedText-textReference-language-icon {
-  position: relative;
-  top: -1px;
-  width: 15px;
-  height: 15px;
-  margin-right: 6px;
-  opacity: 0.2;
-}
-
 .conflictedText-textReference-link {
   margin-right: 4px;
-  color: rgba($color-black, 0.7);
+  opacity: 0.7;
+  color: var(--color-black);
   text-decoration: none;
   font-weight: normal;
   font-size: 12px;
 
   &:focus,
   &:hover {
-    color: $color-primary;
+    color: var(--color-primary);
   }
 }
 
 .conflictedText-textReference {
   display: flex;
   flex-direction: column;
-  border-top: 1px dashed #eee;
+  border-top: 1px dashed var(--background-light-highlight);
 }
 
 .conflictedText-textReference-language {
@@ -195,7 +182,7 @@
   font-size: 11px;
   font-style: italic;
   font-weight: normal;
-  color: lighten($color-grey, 10%);
+  color: var(--color-grey);
 }
 
 .conflictedText-textReference-text-content {

@@ -29,22 +29,25 @@ header "API tests…"
 run mix test
 
 header "Compilation without warnings…"
-run mix compile --warnings-as-errors --force
+run make lint-compile
 
 header "API code auto-formatting…"
-run mix format --dry-run --check-formatted
+run make lint-format
 
 header "API code lint…"
-run mix credo --strict
+run make lint-credo
 
-header "Webapp code auto-formatting…"
-run npm --prefix webapp run prettier-check
+header "Prettier auto-formatting…"
+run make lint-prettier
 
-header "Webapp code lint…"
-run npm --prefix webapp run lint
+header "Eslint code lint…"
+run make lint-eslint
 
-header "Webapp tests…"
-run npm --prefix webapp test
+header "Handlebar template code lint…"
+run make lint-template-hbs
+
+header "Type check Typescript files…"
+run make type-check
 
 if [ ${error_status} -ne 0 ]; then
   echo "\n\n${YELLOW}▶▶ One of the checks ${RED_BOLD}failed${YELLOW}. Please fix it before committing.${NO_COLOR}"

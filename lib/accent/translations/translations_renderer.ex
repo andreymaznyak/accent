@@ -2,38 +2,53 @@ defmodule Accent.TranslationsRenderer do
   alias Langue
 
   def render(args) do
-    serializer = fetch_serializer(args[:document_format])
-    entries = fetch_entries(args[:translations])
+    {:ok, serializer} = Langue.serializer_from_format(args[:document].format)
+    entries = entries(args)
 
-    parser_result = %Langue.Formatter.ParserResult{
+    serialzier_input = %Langue.Formatter.ParserResult{
       entries: entries,
-      language: args[:language],
-      top_of_the_file_comment: args[:document_top_of_the_file_comment],
-      header: args[:document_header]
+      language: %Langue.Language{
+        slug: args[:language].slug,
+        plural_forms: args[:language].plural_forms
+      },
+      document: %Langue.Document{
+        path: args[:document].path,
+        master_language: Accent.Revision.language(args[:master_revision]).slug,
+        top_of_the_file_comment: args[:document].top_of_the_file_comment,
+        header: args[:document].header
+      }
     }
 
     try do
-      serializer.(parser_result)
+      serializer.(serialzier_input)
     rescue
       _ -> Langue.Formatter.SerializerResult.empty()
     end
   end
 
-  defp fetch_serializer(format) do
-    case Langue.serializer_from_format(format) do
-      {:ok, serializer} -> serializer
-    end
-  end
+  def entries(args) do
+    translations = args[:translations]
+    master_translations = Enum.group_by(args[:master_translations], & &1.key)
+    value_map = Map.get(args, :value_map, & &1.corrected_text)
 
-  defp fetch_entries(translations) do
     Enum.map(translations, fn translation ->
+      master_translation = Map.get(master_translations, translation.key)
+
       %Langue.Entry{
+        master_value: fetch_master_value(master_translation, value_map),
         key: translation.key,
-        value: translation.corrected_text,
+        value: value_map.(translation),
         comment: translation.file_comment,
         index: translation.file_index,
         value_type: translation.value_type
       }
     end)
+  end
+
+  defp fetch_master_value(nil, _), do: nil
+  defp fetch_master_value([], _), do: nil
+
+  defp fetch_master_value([master_translation | _], value_map) do
+    value_map.(master_translation)
   end
 end

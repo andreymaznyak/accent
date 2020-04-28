@@ -1,22 +1,16 @@
-{{page-title
-  text=(t 'components.project_comments_list.title')
-  icon='assets/bubble.svg'
-}}
-
-{{#if model.loading}}
-  {{skeleton-ui/progress-line}}
+{{#if this.model.loading}}
+  <SkeletonUi::ProgressLine />
 {{/if}}
 
-{{#if showSkeleton}}
-  {{skeleton-ui/project-comments-list}}
+{{#if this.showSkeleton}}
+  <SkeletonUi::ProjectCommentsList />
 {{else}}
-  {{project-comments-list
-    project=model.project
-    comments=model.comments.entries
-  }}
-
-  {{resource-pagination
-    meta=model.comments.meta
-    onSelectPage=(action 'selectPage')
-  }}
+  <ProjectCommentsList
+    @project={{this.model.project}}
+    @comments={{this.model.comments.entries}}
+  />
+  <ResourcePagination
+    @meta={{this.model.comments.meta}}
+    @onSelectPage={{fn this.selectPage}}
+  />
 {{/if}}

@@ -1,7 +1,8 @@
-& {
+.project-navigation-list {
   display: flex;
   flex-direction: column;
   padding: 10px;
+  margin-left: 15px;
 }
 
 .list-item {
@@ -17,41 +18,43 @@
   align-items: center;
   position: relative;
   left: 1px;
-  transition: $transition-speed $transition-easing;
-  transition-property: color, background;
+  transition: 0.2s ease-in-out;
+  transition-property: color, opacity, background;
   padding: 8px 12px;
   margin-bottom: 10px;
   text-decoration: none;
   font-weight: 600;
   font-size: 13px;
   border-radius: 3px;
+  color: var(--color-black);
+  opacity: 0.6;
 
   &:hover,
   &:focus {
-    background: lighten($color-primary, 48%);
+    opacity: 1;
+    background: var(--background-light);
+    color: var(--color-primary);
 
     .list-item-link-icon {
       transform: scale(1);
-      fill: rgba($color-primary, 0.9);
     }
 
     .list-item-link-text {
-      color: rgba($color-primary, 0.9);
+      color: var(--color-primary);
     }
   }
 
-  &.active {
-    background: lighten($color-primary, 46%);
-  }
+  &:global(.active) {
+    opacity: 1;
+    background: var(--color-primary);
+    color: #fff;
 
-  &.active {
     .list-item-link-icon {
       transform: scale(1);
-      fill: $color-primary;
     }
 
     .list-item-link-text {
-      color: $color-primary;
+      color: #fff;
     }
   }
 }
@@ -59,18 +62,17 @@
 .list-item-link-text {
   width: 127px;
   padding: 0 0 0 12px;
-  color: rgba($color-black, 0.4);
-  transition: $transition-speed $transition-easing;
+  color: var(--color-black);
+  transition: 0.2s ease-in-out;
   transition-property: color;
 }
 
 .list-item-link-icon {
-  transition: $transition-speed $transition-easing;
+  transition: 0.2s ease-in-out;
   transition-property: fill;
   display: inline-block;
   width: 19px;
   height: 19px;
-  fill: rgba($color-black, 0.3);
 }
 
 @media (max-width: 800px) {
@@ -79,28 +81,10 @@
   }
 }
 
-@media (max-width: ($screen-sm)) {
-  & {
-    background: #fff;
-  }
-
-  .list-item-link {
-    left: 0;
-    border-radius: 0;
-    font-size: 14px;
-    padding-left: 8px;
-  }
-
-  .list-item-link-text {
-    display: block;
-    position: static;
-    padding: 0;
-    opacity: 1;
-    text-align: left;
-    width: auto;
-  }
-
-  .list-item-link-icon {
-    margin-right: 6px;
+@media (max-width: var(--screen-sm)) {
+  .project-navigation-list {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 0;
   }
 }

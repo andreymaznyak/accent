@@ -4,7 +4,7 @@ defmodule Langue.Formatter.Gettext.Parser do
   alias Langue.Entry
   alias Langue.Utils.Placeholders
 
-  def parse(%{render: render}) do
+  def parse(%{render: render, document: document}) do
     {:ok, po} = Gettext.PO.parse_string(render)
     entries = parse_translations(po)
     top_of_the_file_comment = join_string(po.top_of_the_file_comments)
@@ -12,8 +12,11 @@ defmodule Langue.Formatter.Gettext.Parser do
 
     %Langue.Formatter.ParserResult{
       entries: entries,
-      top_of_the_file_comment: top_of_the_file_comment,
-      header: header
+      document: %{
+        document
+        | top_of_the_file_comment: top_of_the_file_comment,
+          header: header
+      }
     }
   end
 
@@ -47,7 +50,7 @@ defmodule Langue.Formatter.Gettext.Parser do
     end)
   end
 
-  defp parse_translation(translation) do
+  defp parse_translation(translation = %{msgctxt: nil}) do
     [
       %Entry{
         comment: join_string(translation.comments),
@@ -57,8 +60,22 @@ defmodule Langue.Formatter.Gettext.Parser do
     ]
   end
 
+  defp parse_translation(translation) do
+    [
+      %Entry{
+        comment: join_string(translation.comments),
+        key: join_string(translation.msgid) <> context_suffix(translation.msgctxt),
+        value: join_string(translation.msgstr)
+      }
+    ]
+  end
+
   defp join_string([]), do: nil
   defp join_string(list), do: Enum.join(list, "\n")
 
   defp key_suffix(id), do: ".__KEY__#{id}"
+
+  defp context_suffix(""), do: ""
+
+  defp context_suffix(id), do: ".__CONTEXT__#{id}"
 end

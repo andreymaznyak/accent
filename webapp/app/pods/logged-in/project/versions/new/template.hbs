@@ -1,7 +1,7 @@
-{{#acc-modal onClose=(action 'closeModal')}}
-  {{version-create-form
-    error=error
-    project=model.project
-    onCreate=(action 'create')
-  }}
-{{/acc-modal}}
+<AccModal @small={{true}} @onClose={{fn this.closeModal}}>
+  <VersionCreateForm
+    @error={{this.error}}
+    @project={{this.model.project}}
+    @onCreate={{fn this.create}}
+  />
+</AccModal>

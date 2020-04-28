@@ -3,23 +3,32 @@ defmodule Langue.Formatter.Gettext.Serializer do
 
   alias Langue.Utils.NestedParserHelper
 
-  def serialize(%{entries: entries, top_of_the_file_comment: top_of_the_file_comment, header: header, language: language}) do
+  def serialize(%{entries: entries, document: document, language: language}) do
     comments =
-      top_of_the_file_comment
-      |> String.trim()
-      |> String.split("\n", trim: true)
+      if document.top_of_the_file_comment do
+        document.top_of_the_file_comment
+        |> String.trim_leading()
+        |> String.split("\n", trim: true)
+      else
+        []
+      end
 
     headers =
-      header
-      |> String.trim()
-      |> String.replace("\"", "")
-      |> replace_language_header(language)
-      |> replace_plural_forms_header(language)
-      |> String.split("\n", trim: true)
+      if document.header do
+        document.header
+        |> String.trim_leading()
+        |> String.replace("\"", "")
+        |> replace_language_header(language)
+        |> replace_plural_forms_header(language)
+        |> String.replace(~r/\n(\w)/, "_\\1")
+        |> String.split("_", trim: true)
+      else
+        ""
+      end
 
     render =
       %Gettext.PO{
-        translations: parse_entries(entries, 0),
+        translations: parse_entries(entries),
         top_of_the_file_comments: comments,
         headers: headers
       }
@@ -29,18 +38,29 @@ defmodule Langue.Formatter.Gettext.Serializer do
     %Langue.Formatter.SerializerResult{render: render}
   end
 
-  defp parse_entries(entries, index) do
+  defp parse_entries(entries) do
     entries
-    |> NestedParserHelper.group_by_key_with_index(index, "__KEY__")
+    |> NestedParserHelper.group_by_key_with_index(0, "__KEY__")
     |> Enum.map(&do_parse_entries/1)
   end
 
   defp do_parse_entries({_key, [entry]}) do
-    %Gettext.PO.Translation{
-      comments: split_string(entry.comment, []),
-      msgid: split_string(entry.key),
-      msgstr: split_string(entry.value)
-    }
+    case Regex.named_captures(~r/(?<id>.*)\.__CONTEXT__(?<context>.*)/, entry.key) do
+      %{"id" => id, "context" => context} ->
+        %Gettext.PO.Translation{
+          comments: split_string(entry.comment, []),
+          msgid: split_string(id),
+          msgstr: split_string(entry.value),
+          msgctxt: split_string(context)
+        }
+
+      _ ->
+        %Gettext.PO.Translation{
+          comments: split_string(entry.comment, []),
+          msgid: split_string(entry.key),
+          msgstr: split_string(entry.value)
+        }
+    end
   end
 
   defp do_parse_entries({_key, [plural_entry | entries]}) do

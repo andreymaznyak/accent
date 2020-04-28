@@ -1,6 +1,19 @@
-& {
+.project-create-form {
   padding: 20px;
-  background: #fff;
+  background: var(--body-background);
+
+  :global(.ember-power-select-trigger) {
+    min-height: 35px;
+    border: 1px solid var(--background-light-highlight);
+    background: var(--background-light);
+    box-shadow: 0 1px 5px var(--shadow-color);
+  }
+
+  .textInput {
+    &:focus {
+      border: 2px solid var(--background-light-highlight);
+    }
+  }
 }
 
 .title {
@@ -8,7 +21,12 @@
   text-align: center;
   font-size: 27px;
   font-weight: 300;
-  color: $color-primary;
+  color: var(--color-green);
+}
+
+.formItem-fields {
+  display: flex;
+  align-items: center;
 }
 
 .textInput {
@@ -16,28 +34,71 @@
   flex-grow: 1;
   flex-shrink: 0;
   padding: 10px;
-  margin-right: 25px;
-  min-width: 250px;
-  width: 100%;
+  margin-right: 5px;
   font-size: 12px;
-  font-family: $font-primary;
+  font-family: var(--font-primary);
+}
+
+.colorInput {
+  @extend %textInput;
+  width: 48px;
+  margin-right: 5px;
+  height: 40px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+.logoInput {
+  @extend %textInput;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 40px;
+  padding: 6px 5px 3px;
+  cursor: pointer;
+  font-size: 25px;
+
+  svg {
+    position: relative;
+    top: -2px;
+    width: 25px;
+    height: 21px;
+
+    circle {
+      fill: var(--logo-background);
+    }
+
+    path {
+      fill: var(--logo-foreground);
+    }
+  }
 }
 
 .errors {
   margin-bottom: 15px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid rgba($color-error, 0.3);
 }
 
 .error {
   margin-bottom: 5px;
-  color: $color-error;
+  color: var(--color-error);
   font-size: 13px;
   font-weight: bold;
 }
 
 .formItem {
   margin-bottom: 20px;
+}
+
+.formItem-loading {
+  margin: 0 10px 0 5px;
+  padding: 0;
+  align-items: flex-start;
+
+  svg {
+    width: 26px;
+    margin-bottom: 0;
+  }
 }
 
 .formItem-label {
@@ -47,14 +108,5 @@
 }
 
 .formActions {
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
-
-.ember-power-select-trigger {
-  min-height: 31px;
-  border-color: #eee;
-  border: 1px solid #eee;
-  background: #fafafa;
-  box-shadow: 0 1px 5px rgba(#000, 0.06);
+  padding-top: 10px;
 }

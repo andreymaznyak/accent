@@ -1,16 +1,29 @@
-& {
+.project-settings-form {
   margin-top: 25px;
 }
 
 .textInput {
   @extend %textInput;
-  flex-grow: 1;
+  width: 350px;
+  margin-right: 5px;
+  flex-grow: 0;
   flex-shrink: 0;
   padding: 10px;
-  margin-right: 25px;
-  min-width: 250px;
-  font-family: $font-primary;
+  font-family: var(--font-primary);
   font-size: 12px;
+}
+
+.colorInput {
+  @extend %textInput;
+  margin-right: 5px;
+  width: 48px;
+  height: 40px;
+  padding: 2px 5px;
+}
+
+.field {
+  display: flex;
+  margin-bottom: 15px;
 }
 
 .lock {
@@ -18,7 +31,7 @@
   align-items: center;
   margin: 20px 0;
   padding: 10px;
-  background: #fafafa;
+  background: var(--background-light);
 }
 
 .lock-text-helper {
@@ -27,7 +40,7 @@
   color: #555;
 }
 
-.lock-text {
+div.lock-text {
   display: inline-flex;
   align-items: center;
   margin-right: 12px;
@@ -35,50 +48,97 @@
   font-weight: bold;
   cursor: pointer;
   border: 1px solid;
-  background: #fff;
-  border-bottom-width: 2px;
-  padding: 3px 12px 3px 5px;
-  border-radius: 3px;
+  padding: 3px 5px;
 
   &.lock-text--inactive {
     color: #aaa;
     border-color: #ddd;
 
     &:hover {
-      color: $color-primary;
-      border-color: $color-primary;
+      color: var(--color-green);
+      border-color: var(--color-green);
 
       .lock-icon {
-        fill: $color-primary;
+        stroke: var(--color-green);
       }
     }
 
     .lock-icon {
-      fill: #aaa;
+      stroke: #aaa;
     }
   }
 
   &.lock-text--active {
-    color: $color-error;
-    border-color: $color-error;
-
-    &:hover {
-      color: darken($color-error, 10%);
-      border-color: darken($color-error, 10%);
-
-      .lock-icon {
-        fill: darken($color-error, 10%);
-      }
-    }
+    color: var(--color-error);
+    border-color: var(--color-error);
 
     .lock-icon {
-      fill: $color-error;
+      stroke: var(--color-error);
     }
   }
 }
 
 .lock-icon {
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   margin-right: 6px;
+}
+
+.logo {
+  display: flex;
+  width: 25px;
+  height: 22px;
+  padding: 0;
+  font-size: 25px;
+  line-height: 1;
+  background: transparent;
+  cursor: pointer;
+
+  svg {
+    width: 25px;
+    height: 21px;
+
+    circle {
+      fill: var(--logo-background);
+    }
+
+    path {
+      fill: var(--logo-foreground);
+    }
+  }
+
+  &:hover {
+    opacity: 0.6;
+  }
+}
+
+.logo-field {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  height: 40px;
+  border-radius: 4px;
+  border: 2px solid var(--input-border-color);
+  background: var(--input-background);
+}
+
+.logoReset {
+  position: absolute;
+  top: -3px;
+  right: -14px;
+  padding: 0;
+  background: none;
+  color: #999;
+
+  svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  &:focus,
+  &:hover {
+    opacity: 0.6;
+  }
 }

@@ -4,6 +4,16 @@ defmodule Accent.Revision do
   schema "revisions" do
     field(:master, :boolean, default: true)
 
+    field(:name, :string)
+    field(:slug, :string)
+    field(:iso_639_1, :string)
+    field(:iso_639_3, :string)
+    field(:locale, :string)
+    field(:android_code, :string)
+    field(:osx_code, :string)
+    field(:osx_locale, :string)
+    field(:plural_forms, :string)
+
     belongs_to(:master_revision, Accent.Revision)
     belongs_to(:project, Accent.Project)
     belongs_to(:language, Accent.Language)
@@ -29,11 +39,23 @@ defmodule Accent.Revision do
     |> unique_constraint(:language, name: :revisions_project_id_language_id_index)
   end
 
-  def merge_stats(revision, stats) do
-    translations_count = stats[revision.id][:active] || 0
-    conflicts_count = stats[revision.id][:conflicted] || 0
-    reviewed_count = translations_count - conflicts_count
+  def language(revision) do
+    language_override =
+      revision
+      |> Map.take(~w(
+      name
+      slug
+      iso_639_1
+      iso_639_3
+      locale
+      android_code
+      osx_code
+      osx_locale
+      plural_forms
+    )a)
+      |> Enum.reject(fn {_key, value} -> value in [nil, ""] end)
+      |> Enum.into(%{})
 
-    %{revision | translations_count: translations_count, conflicts_count: conflicts_count, reviewed_count: reviewed_count}
+    Map.merge(revision.language, language_override)
   end
 end

@@ -5,6 +5,7 @@ defmodule Accent.GraphQL.Resolvers.Project do
 
   alias Accent.{
     GraphQL.Paginated,
+    Operation,
     Plugs.GraphQLContext,
     Project,
     ProjectCreator,
@@ -19,10 +20,12 @@ defmodule Accent.GraphQL.Resolvers.Project do
   @typep project_operation :: {:ok, %{project: Project.t() | nil, errors: [String.t()] | nil}}
 
   @spec create(any(), %{name: String.t(), language_id: String.t()}, GraphQLContext.t()) :: project_operation
-  def create(_, %{name: name, language_id: language_id}, info) do
+  def create(_, args, info) do
     params = %{
-      "name" => name,
-      "language_id" => language_id
+      "name" => args.name,
+      "main_color" => args.main_color,
+      "logo" => args.logo,
+      "language_id" => args.language_id
     }
 
     case ProjectCreator.create(params: params, user: info.context[:conn].assigns[:current_user]) do
@@ -41,11 +44,22 @@ defmodule Accent.GraphQL.Resolvers.Project do
     {:ok, %{project: project, errors: nil}}
   end
 
-  @spec update(Project.t(), %{name: String.t(), is_file_operations_locked: boolean() | nil}, GraphQLContext.t()) :: project_operation
-  def update(project, %{name: name, is_file_operations_locked: locked_file_operations}, info) do
+  @spec update(Project.t(), %{name: String.t(), main_color: String.t()}, GraphQLContext.t()) :: project_operation
+  def update(project, args, info) do
+    args =
+      Map.merge(
+        %{
+          is_file_operations_locked: nil,
+          logo: nil
+        },
+        args
+      )
+
     params = %{
-      "name" => name,
-      "locked_file_operations" => locked_file_operations
+      "name" => args.name,
+      "main_color" => args.main_color,
+      "logo" => args.logo,
+      "locked_file_operations" => args.is_file_operations_locked
     }
 
     case ProjectUpdater.update(project: project, params: params, user: info.context[:conn].assigns[:current_user]) do
@@ -57,8 +71,6 @@ defmodule Accent.GraphQL.Resolvers.Project do
     end
   end
 
-  def update(project, %{name: name}, info), do: update(project, %{name: name, is_file_operations_locked: nil}, info)
-
   @spec list_viewer(User.t(), %{query: String.t(), page: number()}, GraphQLContext.t()) :: {:ok, Paginated.t(Project.t())}
   def list_viewer(viewer, args, _info) do
     Project
@@ -66,6 +78,7 @@ defmodule Accent.GraphQL.Resolvers.Project do
     |> Query.where([_, c], c.user_id == ^viewer.id)
     |> Query.order_by([p, _], asc: p.name)
     |> ProjectScope.from_search(args[:query])
+    |> ProjectScope.with_stats()
     |> Repo.paginate(page: args[:page])
     |> Paginated.format()
     |> (&{:ok, &1}).()
@@ -74,7 +87,19 @@ defmodule Accent.GraphQL.Resolvers.Project do
   @spec show_viewer(any(), %{id: String.t()}, GraphQLContext.t()) :: {:ok, Project.t() | nil}
   def show_viewer(_, %{id: id}, _) do
     Project
+    |> ProjectScope.with_stats()
     |> Repo.get(id)
+    |> (&{:ok, &1}).()
+  end
+
+  @spec last_activity(Project.t(), any(), GraphQLContext.t()) :: {:ok, Operation.t() | nil}
+  def last_activity(project, _, _) do
+    Operation
+    |> Query.join(:left, [o], r in assoc(o, :revision))
+    |> Query.where([o, r], r.project_id == ^project.id or o.project_id == ^project.id)
+    |> Query.order_by([o], desc: o.inserted_at)
+    |> Query.limit(1)
+    |> Repo.one()
     |> (&{:ok, &1}).()
   end
 end

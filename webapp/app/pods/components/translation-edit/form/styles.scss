@@ -1,73 +1,77 @@
-& {
+.translation-edit-form {
   height: 100%;
-}
 
-.ember-radio-button {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-bottom: 3px;
-  border-radius: 3px;
-  font-weight: bold;
-  font-size: 13px;
-  color: #444;
+  :global(.ember-radio-button) {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 3px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #444;
 
-  &.checked {
-    background: lighten($color-primary, 45%);
-    color: darken($color-primary, 25%);
-  }
+    &.checked {
+      background: var(--background-light-highlight);
+      color: var(--text-color-normal);
+    }
 
-  input {
-    margin-right: 8px;
+    input {
+      margin-right: 8px;
+    }
   }
 }
 
 .label {
   width: 100%;
   padding: 5px 5px 5px 8px;
-  border-left: 2px solid lighten($color-blue, 40%);
   margin-bottom: 5px;
-  background: lighten($color-blue, 46%);
+  background: hsl(
+    var(--color-blue-hue),
+    var(--color-blue-saturation),
+    var(--color-highlight-lighteness)
+  );
   font-size: 12px;
-  color: #888;
+  color: var(--color-blue);
 }
 
 .inputText {
   @extend %textInput;
   width: 100%;
   height: 100%;
-  padding: 10px;
+  padding: 10px 170px 10px 10px;
   font-size: 12px;
 
   &::placeholder {
     opacity: 0.2;
     font-style: italic;
-    font-family: $font-primary;
+    font-family: var(--font-primary);
   }
 }
 
 .placeholders {
   margin: 0 0 15px;
+  padding: 15px;
+  border-radius: 3px;
   font-size: 12px;
+  background: hsl(
+    var(--color-blue-hue),
+    var(--color-blue-saturation),
+    var(--color-highlight-lighteness)
+  );
+  color: var(--color-blue);
 }
 
 .placeholders-title {
   display: flex;
   align-items: center;
-  padding: 10px 10px 0;
-  background: lighten($color-blue, 46%);
-  border-left: 2px solid lighten($color-blue, 40%);
+  margin-bottom: 3px;
   font-size: 13px;
   font-weight: bold;
-  color: $color-blue;
 }
 
 .placeholders-text {
   margin-bottom: 6px;
-  padding: 5px 10px 8px;
-  background: lighten($color-blue, 46%);
-  border-left: 2px solid lighten($color-blue, 40%);
-  color: darken($color-blue, 15%);
 }
 
 .placeholders-text-content {
@@ -77,14 +81,14 @@
 .placeholders-item {
   display: flex;
   align-items: center;
-  padding-left: 12px;
-  border-left: 2px solid lighten($color-true-black, 80%);
-  font-size: 14px;
-  color: darken($color-blue, 15%);
+  font-size: 12px;
+  color: var(--text-color-normal);
+  opacity: 0.8;
+  transition: color 0.2s ease-in-out, opacity 0.2s ease-in-out;
 
   &.placeholders-item--warning {
-    border-color: lighten($color-error, 20%);
-    color: lighten($color-error, 10%);
+    opacity: 1;
+    color: var(--color-error);
   }
 }
 
@@ -92,12 +96,12 @@
   margin-right: 5px;
   width: 14px;
   height: 14px;
-  fill: lighten($color-error, 15%);
+  stroke: var(--color-error);
 }
 
 .placeholders-title-icon {
   width: 14px;
   height: 14px;
   margin-right: 6px;
-  fill: darken($color-blue, 10%);
+  stroke: var(--color-blue);
 }

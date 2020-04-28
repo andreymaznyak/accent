@@ -13,7 +13,15 @@ defmodule Accent.GraphQL.Types.Project do
   object :project do
     field(:id, :id)
     field(:name, :string)
+    field(:main_color, :string)
     field(:last_synced_at, :datetime)
+    field(:logo, :string)
+
+    field(:translations_count, non_null(:integer))
+    field(:conflicts_count, non_null(:integer))
+    field(:reviewed_count, non_null(:integer))
+
+    field(:last_activity, :activity, resolve: &Accent.GraphQL.Resolvers.Project.last_activity/3)
     field(:is_file_operations_locked, non_null(:boolean), resolve: field_alias(:locked_file_operations))
 
     field :access_token, :string do
@@ -29,7 +37,7 @@ defmodule Accent.GraphQL.Types.Project do
     end
 
     field(:language, :language, resolve: dataloader(Accent.Language))
-    field(:integrations, list_of(:integration), resolve: dataloader(Accent.Integration))
+    field(:integrations, list_of(:project_integration), resolve: dataloader(Accent.Integration))
 
     field :document, :document do
       arg(:id, non_null(:id))
@@ -72,7 +80,7 @@ defmodule Accent.GraphQL.Types.Project do
     end
 
     field :revision, :revision do
-      arg(:id, non_null(:id))
+      arg(:id, :id)
 
       resolve(project_authorize(:show_revision, &Accent.GraphQL.Resolvers.Revision.show_project/3))
     end

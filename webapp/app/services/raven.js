@@ -3,7 +3,7 @@ import Service from '@ember/service';
 import {computed} from '@ember/object';
 import {typeOf} from '@ember/utils';
 import Ember from 'ember';
-import Raven from 'npm:raven-js';
+import Raven from 'raven-js';
 
 /**
  * Default available logger service.
@@ -88,7 +88,7 @@ export default Service.extend({
     if (this.isRavenUsable && !this.globalErrorCatchingInitialized) {
       const _oldOnError = Ember.onerror;
 
-      Ember.onerror = error => {
+      Ember.onerror = (error) => {
         if (this._ignoreError(error)) {
           return;
         }
@@ -108,16 +108,16 @@ export default Service.extend({
         if (typeOf(reason) === 'error') {
           this.captureException(reason, {
             extra: {
-              context: label || this.unhandledPromiseErrorMessage
-            }
+              context: label || this.unhandledPromiseErrorMessage,
+            },
           });
           this.didCaptureException(reason);
         } else {
           this.captureMessage(this._extractMessage(reason), {
             extra: {
               reason,
-              context: label
-            }
+              context: label,
+            },
           });
         }
       });
@@ -197,5 +197,5 @@ export default Service.extend({
         return false;
       }
     }
-  }
+  },
 });

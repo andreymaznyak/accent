@@ -7,6 +7,8 @@ defmodule Accent.GraphQL.Schema do
   import_types(Accent.GraphQL.DatetimeScalar)
 
   # Types
+  import_types(AbsintheErrorPayload.ValidationMessageTypes)
+  import_types(Accent.GraphQL.Types.AuthenticationProvider)
   import_types(Accent.GraphQL.Types.DocumentFormat)
   import_types(Accent.GraphQL.Types.Role)
   import_types(Accent.GraphQL.Types.Viewer)
@@ -23,6 +25,7 @@ defmodule Accent.GraphQL.Schema do
   import_types(Accent.GraphQL.Types.Language)
   import_types(Accent.GraphQL.Types.Version)
   import_types(Accent.GraphQL.Types.MutationResult)
+  import_types(Accent.GraphQL.Types.Lint)
 
   query do
     field :viewer, :viewer do
@@ -33,6 +36,10 @@ defmodule Accent.GraphQL.Schema do
       arg(:query, :string)
 
       resolve(&Accent.GraphQL.Resolvers.Language.list/3)
+    end
+
+    field :authentication_providers, non_null(list_of(non_null(:authentication_provider))) do
+      resolve(&Accent.GraphQL.Resolvers.AuthenticationProvider.list/3)
     end
 
     field :roles, non_null(list_of(non_null(:role_item))) do

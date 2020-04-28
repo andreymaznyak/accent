@@ -1,64 +1,59 @@
-{{#acc-modal onClose=(action 'closeModal')}}
-  {{#project-file-operation}}
-    <button {{action 'closeModal'}} class="closeButton">
+<AccModal @onClose={{fn this.closeModal}}>
+  <ProjectFileOperation>
+    <button class="closeButton" {{on "click" (fn this.closeModal)}}>
       <div class="closeButton-content">
-        {{inline-svg '/assets/x.svg' class='closeButton-icon'}}
+        {{inline-svg "/assets/x.svg" class="closeButton-icon"}}
       </div>
     </button>
 
     <div class="title">
       <div class="sectionType">
         <div class="versionTitle">
-          <strong class="versionTitle-name">{{version.name}}</strong>
+          <strong class="versionTitle-name">
+            {{this.version.name}}
+          </strong>
           <span class="versionTitle-tag">
-            {{inline-svg '/assets/tag.svg' class='versionTitle-tag-icon'}}
-            {{version.tag}}
+            {{this.version.tag}}
           </span>
         </div>
       </div>
-
-      {{document.path}}
-
-      <div class="subtitle">
-        <small class="subtitle-label">{{t 'components.project_file_operations.document_format'}}:</small>
-        {{document.format}}
-      </div>
     </div>
 
-    {{revision-export-options
-      format=documentFormatFilter
-      documents=documents
-      document=documentFilter
-      orderBy=orderByFilter
-      revision=revisionFilter
-      revisions=revisions
-      onChangeDocument=(action (mut documentFilter))
-      onChangeRevision=(action (mut revisionFilter))
-      onChangeFormat=(action (mut documentFormatFilter))
-      onChangeOrderBy=(action (mut orderByFilter))
-    }}
+    <RevisionExportOptions
+      @format={{this.documentFormatFilter}}
+      @documents={{this.documents}}
+      @document={{this.documentFilter}}
+      @orderBy={{this.orderByFilter}}
+      @revision={{this.revisionFilter}}
+      @revisions={{this.revisions}}
+      @onChangeDocument={{fn (mut this.documentFilter)}}
+      @onChangeRevision={{fn (mut this.revisionFilter)}}
+      @onChangeFormat={{fn (mut this.documentFormatFilter)}}
+      @onChangeOrderBy={{fn (mut this.orderByFilter)}}
+    />
 
-    {{#async-button
-      onClick=(action 'exportFile')
-      disabled=exportButtonDisabled
-      class='button button--filled render-export'
-    }}
-      {{t 'components.project_file_operations.export'}}
-    {{/async-button}}
+    <AsyncButton
+      @onClick={{fn this.exportFile}}
+      @disabled={{this.exportButtonDisabled}}
+      class="button button--filled renderExport"
+    >
+      {{t "components.project_file_operations.export"}}
+    </AsyncButton>
 
-    {{#if exportLoading}}
-      {{skeleton-ui/progress-line}}
+    {{#if this.exportLoading}}
+      <SkeletonUi::ProgressLine />
     {{/if}}
 
-    <pre class="render">{{file-export
-        onFileLoaded=(action 'onFileLoaded')
-        project=project
-        revisions=revisions
-        revision=revision
-        document=document
-        version=version.tag
-        documentFormat=documentFormatFilter
-        orderBy=orderByFilter
-      }}</pre>
-  {{/project-file-operation}}
-{{/acc-modal}}
+    <FileExport
+      class="render"
+      @onFileLoaded={{fn this.onFileLoaded}}
+      @project={{this.project}}
+      @revisions={{this.revisions}}
+      @revision={{this.revision}}
+      @document={{this.document}}
+      @version={{this.version.tag}}
+      @documentFormat={{this.documentFormatFilter}}
+      @orderBy={{this.orderByFilter}}
+    />
+  </ProjectFileOperation>
+</AccModal>

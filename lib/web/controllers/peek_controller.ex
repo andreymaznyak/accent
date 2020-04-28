@@ -2,24 +2,16 @@ defmodule Accent.PeekController do
   use Phoenix.Controller
 
   import Canary.Plugs
-  import Accent.Plugs.RevisionIdFromProjectLanguage
-
-  alias Accent.{
-    Language,
-    Project,
-    Revision
-  }
 
   alias Accent.Hook.Context, as: HookContext
+  alias Accent.Project
   alias Movement.Builders.ProjectSync, as: ProjectSyncBuilder
   alias Movement.Builders.RevisionMerge, as: RevisionMergeBuilder
 
   plug(Plug.Assign, [canary_action: :peek_merge] when action === :merge)
   plug(Plug.Assign, [canary_action: :peek_sync] when action === :sync)
   plug(:load_and_authorize_resource, model: Project, id_name: "project_id")
-  plug(:load_resource, model: Language, id_name: "language", id_field: "slug")
-  plug(:fetch_revision_id_from_project_language when action === :merge)
-  plug(:load_and_authorize_resource, model: Revision, id_name: "revision_id", preload: :language, only: [:peek_merge])
+  plug(Accent.Plugs.AssignRevisionLanguage when action === :merge)
   plug(Accent.Plugs.MovementContextParser)
   plug(:assign_merge_comparer when action in [:merge])
   plug(:assign_sync_comparer when action in [:sync])
@@ -57,7 +49,7 @@ defmodule Accent.PeekController do
       |> Map.get(:operations)
       |> Enum.group_by(&Map.get(&1, :revision_id))
 
-    Accent.Hook.fanout(%HookContext{
+    Accent.Hook.notify(%HookContext{
       event: "peek_sync",
       project: conn.assigns[:project],
       user: conn.assigns[:current_user]
@@ -101,7 +93,7 @@ defmodule Accent.PeekController do
       |> Map.get(:operations)
       |> Enum.group_by(&Map.get(&1, :revision_id))
 
-    Accent.Hook.fanout(%HookContext{
+    Accent.Hook.notify(%HookContext{
       event: "peek_merge",
       project: conn.assigns[:project],
       user: conn.assigns[:current_user],

@@ -50,4 +50,20 @@ defmodule Accent.Translation do
     model
     |> cast(params, @optional_fields)
   end
+
+  @spec to_langue_entry(map(), map(), boolean) :: Langue.Entry.t()
+  def to_langue_entry(translation, master_translation, is_master) do
+    %Langue.Entry{
+      key: translation.key,
+      value: translation.corrected_text,
+      master_value: master_translation.corrected_text,
+      is_master: is_master,
+      comment: translation.file_comment,
+      index: translation.file_index,
+      value_type: translation.value_type,
+      locked: translation.locked,
+      plural: translation.plural,
+      placeholders: translation.placeholders
+    }
+  end
 end

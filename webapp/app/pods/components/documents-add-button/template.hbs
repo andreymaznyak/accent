@@ -1,8 +1,9 @@
-{{#link-to
-  'logged-in.project.files.new-sync'
-  project.id
-  class='button'
-}}
-  {{inline-svg '/assets/add.svg' class='button-icon'}}
-  {{t 'components.documents_add_button.link'}}
-{{/link-to}}
+<LinkTo
+  @route="logged-in.project.files.new-sync"
+  @model={{@project.id}}
+  local-class="button"
+  class="button button--bordered button--primary"
+>
+  {{inline-svg "/assets/add.svg" class="button-icon"}}
+  {{t "components.documents_add_button.link"}}
+</LinkTo>

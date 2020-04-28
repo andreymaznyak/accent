@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "format": "gettext",
+      "source": "priv/en/*.po",
+      "target": "priv/%slug%/%document_path%.po"
+    }
+  ]
+}

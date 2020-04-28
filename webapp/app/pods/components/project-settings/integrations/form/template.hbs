@@ -1,45 +1,54 @@
-<div>
-  <div class="form">
-    {{#power-select
-      disabled=true
-      searchEnabled=false
-      selected=serviceValue
-      options=mappedServices
-      onchange=(action (mut service) value='value') as |option|
-    }}
-      {{t option.label}}
-    {{/power-select}}
+<div
+  {{did-insert (fn this.didUpdateIntegration)}}
+  {{did-update (fn this.didUpdateIntegration) @integration}}
+  {{did-insert (fn this.didUpdateErrors)}}
+  {{did-update (fn this.didUpdateErrors) @errors}}
+  local-class="project-settings-integrations-form"
+>
+  {{#if this.integration}}
+    <div local-class="form">
+      <AccSelect
+        @searchEnabled={{false}}
+        @selected={{this.serviceValue}}
+        @renderInPlace={{true}}
+        @options={{this.mappedServices}}
+        @onchange={{fn this.setService}}
+      />
+    </div>
 
-    {{input
-      value=url
-      class='textInput'
-    }}
+    <div local-class="data">
+      {{component
+        this.dataFormComponent
+        repository=this.repository
+        defaultRef=this.defaultRef
+        token=this.token
+        errors=this.errors
+        url=this.url
+        project=@project
+        syncChecked=this.syncChecked
+        onChangeUrl=(fn this.setUrl)
+        onChangeSyncChecked=(fn this.setSyncChecked)
+        onChangeRepository=(fn this.setRepository)
+        onChangeToken=(fn this.setToken)
+        onChangeDefaultRef=(fn this.setDefaultRef)
+      }}
+    </div>
 
-    {{#async-button
-      onClick=(action 'submit')
-      loading=isCreating
-      disabled=emptyUrl
-      class='button button--filled'
-    }}
-      {{t 'components.project_settings.integrations.save'}}
-    {{/async-button}}
+    <div local-class="actions">
+      <AsyncButton
+        @onClick={{fn this.submit}}
+        @loading={{this.isCreating}}
+        class="button button--filled"
+      >
+        {{t "components.project_settings.integrations.save"}}
+      </AsyncButton>
 
-    {{#if onCancel}}
-      <button {{action onCancel}} class="button button--filled button--white">
-        Cancel
-      </button>
-    {{/if}}
-  </div>
-
-  <div class="events">
-    <h3 class="events-title">
-      {{t 'components.project_settings.integrations.events.title'}}
-    </h3>
-
-    {{checkbox-with-label
-      checked=syncChecked
-      text=(t 'components.project_settings.integrations.events.options.sync')
-      update=(action (mut syncChecked))
-    }}
-  </div>
+      {{#if @onCancel}}
+        <button local-class="button" class="button button--filled button--white" {{on "click" (fn @onCancel)}}>
+          {{t "components.project_settings.integrations.cancel"}}
+        </button>
+      {{/if}}
+    </div>
+  {{/if}}
 </div>
+

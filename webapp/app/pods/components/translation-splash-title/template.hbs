@@ -1,61 +1,65 @@
-<div>
-  {{#link-to
-    'logged-in.project.revision.translations'
-    project.id
-    translation.revision.id
-    (query-params version=versionParam)
-    class='language'
-  }}
-    {{inline-svg 'assets/chevron-left.svg' class='back-icon'}}
-    {{translation.revision.language.name}}
-  {{/link-to}}
+<div local-class="translation-splash-file">
+  {{#if this.withRevisionLink}}
+    <LinkTo
+      @route="logged-in.project.revision.translations"
+      @models={{array @project.id @translation.revision.id}}
+      local-class="language"
+    >
+      {{inline-svg "assets/chevron-left.svg" local-class="back-icon"}}
+      {{this.revisionName}}
+    </LinkTo>
+  {{/if}}
 
-  <h1 class="key">
-    <small class="key-prefix">{{translationKey.prefix}}</small>
-    {{translationKey.value}}
+  <h1 local-class="key">
+    <small local-class="key-prefix">
+      {{#if this.translationKey.prefix}}
+        {{this.translationKey.prefix}}
+      {{else}}
+        {{@translation.document.path}}
+      {{/if}}
+    </small>
+    {{this.translationKey.value}}
   </h1>
 
   {{#if translation.version}}
-    {{#acc-badge}}
-      <span class="version-tag">
-        {{inline-svg 'assets/tag.svg' class='version-icon'}}
-        {{translation.version.tag}}
+    <AccBadge>
+      <span local-class="version-tag">
+        {{@translation.version.tag}}
       </span>
-    {{/acc-badge}}
+    </AccBadge>
   {{/if}}
 
-  {{#if translation.plural}}
-    {{#acc-badge
-      link=true
-    }}
-      {{#link-to
-        'logged-in.project.revision.translations'
-        project.id
-        translation.revision.id
-        (query-params query=pluralBaseKey)
+  {{#if @translation.plural}}
+    <AccBadge @link={{true}}>
+      <LinkTo
+        @route="logged-in.project.revision.translations"
+        @models={{array @project.id @translation.revision.id}}
+      >
+        {{t "components.translation_splash_title.plural_label"}}
+      </LinkTo>
+    </AccBadge>
+  {{/if}}
+
+  {{#if @translation.isRemoved}}
+    <div local-class="removedBadge">
+      {{t
+        "components.translation_splash_title.removed_label"
+        removedAt=(time-ago-in-words @translation.updatedAt)
       }}
-        {{t 'components.translation_splash_title.plural_label'}}
-      {{/link-to}}
-    {{/acc-badge}}
-  {{/if}}
-
-  {{#if translation.isRemoved}}
-    <div class="removedBadge">
-      {{t 'components.translation_splash_title.removed_label' removedAt=(time-ago-in-words translation.updatedAt)}}
     </div>
-  {{else if translation.isConflicted}}
-    {{#acc-badge
-      link=true
-      primary=true
-    }}
-      {{#link-to
-        'logged-in.project.revision.conflicts'
-        project.id
-        translation.revision.id
-        (query-params query=translation.id)
-      }}
-        {{t 'components.translation_splash_title.conflicted_label'}}
-      {{/link-to}}
-    {{/acc-badge}}
+  {{else if @translation.isConflicted}}
+    <AccBadge @link={{this.withRevisionLink}} @primary={{true}}>
+      {{#if this.withRevisionLink}}
+        <LinkTo
+          @route="logged-in.project.revision.conflicts"
+          @models={{array @project.id @translation.revision.id}}
+          @query={{hash query=@translation.id}}
+        >
+          {{t "components.translation_splash_title.conflicted_label"}}
+        </LinkTo>
+      {{else}}
+        {{t "components.translation_splash_title.conflicted_label"}}
+      {{/if}}
+    </AccBadge>
   {{/if}}
 </div>

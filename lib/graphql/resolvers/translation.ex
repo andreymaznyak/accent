@@ -109,9 +109,13 @@ defmodule Accent.GraphQL.Resolvers.Translation do
       |> TranslationScope.from_document(args[:document] || :all)
       |> TranslationScope.parse_order(args[:order])
       |> TranslationScope.parse_conflicted(args[:is_conflicted])
+      |> TranslationScope.parse_added_last_sync(args[:is_added_last_sync], revision.project_id)
+      |> TranslationScope.parse_not_empty(args[:is_text_not_empty])
+      |> TranslationScope.parse_empty(args[:is_text_empty])
+      |> TranslationScope.parse_commented_on(args[:is_commented_on])
       |> TranslationScope.from_version(args[:version])
       |> Query.preload(:revision)
-      |> Repo.paginate(page: args[:page])
+      |> Repo.paginate(page: args[:page], page_size: args[:page_size])
 
     translations = %{translations | entries: add_related_translations(translations.entries, args[:reference_revision], args[:version])}
 

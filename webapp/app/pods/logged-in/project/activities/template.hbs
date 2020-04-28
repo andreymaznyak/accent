@@ -1,41 +1,35 @@
-{{page-title
-  text=(t 'components.project_activities_list.title')
-  icon='assets/activity.svg'
-}}
+{{#if this.showSkeleton}}
+  <SkeletonUi::ProjectActivitiesFilter />
 
-{{#if showSkeleton}}
-  {{skeleton-ui/project-activities-filter}}
-
-  {{#if model.loading}}
-    {{skeleton-ui/progress-line}}
+  {{#if this.model.loading}}
+    <SkeletonUi::ProgressLine />
   {{/if}}
-
-  {{skeleton-ui/activities-list showTranslationLink=true}}
+  <SkeletonUi::ActivitiesList @showTranslationLink={{true}} />
 {{else}}
-  {{#if model.collaborators}}
-    {{project-activities-filter
-      collaborators=model.collaborators
-      batchFilter=batchFilter
-      actionFilter=actionFilter
-      userFilter=userFilter
-      userFilterChange=(action 'userFilterChange')
-      batchFilterChange=(action 'batchFilterChange')
-      actionFilterChange=(action 'actionFilterChange')
-    }}
+  {{#if this.model.collaborators}}
+    <ProjectActivitiesFilter
+      @collaborators={{this.model.collaborators}}
+      @batchFilter={{this.batchFilter}}
+      @actionFilter={{this.actionFilter}}
+      @userFilter={{this.userFilter}}
+      @userFilterChange={{fn this.userFilterChange}}
+      @batchFilterChange={{fn this.batchFilterChange}}
+      @actionFilterChange={{fn this.actionFilterChange}}
+    />
   {{/if}}
 
-  {{#if model.loading}}
-    {{skeleton-ui/progress-line}}
+  {{#if this.model.loading}}
+    <SkeletonUi::ProgressLine />
   {{/if}}
 
-  {{project-activities-list
-    permissions=permissions
-    activities=model.activities.entries
-    project=model.project
-  }}
+  <ProjectActivitiesList
+    @permissions={{this.permissions}}
+    @activities={{this.model.activities.entries}}
+    @project={{this.model.project}}
+  />
 
-  {{resource-pagination
-    meta=model.activities.meta
-    onSelectPage=(action 'selectPage')
-  }}
+  <ResourcePagination
+    @meta={{this.model.activities.meta}}
+    @onSelectPage={{fn this.selectPage}}
+  />
 {{/if}}

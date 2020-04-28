@@ -1,8 +1,6 @@
 # Configuration
 # -------------
-
-APP_NAME ?= `grep 'app:' mix.exs | sed -e 's/\[//g' -e 's/ //g' -e 's/app://' -e 's/[:,]//g'`
-APP_VERSION ?= `grep 'version:' mix.exs | cut -d '"' -f2`
+APP_VERSION ?= `grep -E '@version "([0-9\.]*)"' mix.exs | cut -d '"' -f2`
 DOCKER_IMAGE_TAG ?= latest
 GIT_REVISION ?= `git rev-parse HEAD`
 
@@ -16,9 +14,6 @@ help: header targets
 header:
 	@echo "\033[34mEnvironment\033[0m"
 	@echo "\033[34m---------------------------------------------------------------\033[0m"
-	@printf "\033[33m%-23s\033[0m" "APP_NAME"
-	@printf "\033[35m%s\033[0m" $(APP_NAME)
-	@echo ""
 	@printf "\033[33m%-23s\033[0m" "APP_VERSION"
 	@printf "\033[35m%s\033[0m" $(APP_VERSION)
 	@echo ""
@@ -46,18 +41,37 @@ dependencies-mix:
 	mix deps.get --force
 
 .PHONY: dependencies-npm
-dependencies-npm:
+dependencies-npm: dependencies-npm-root dependencies-npm-webapp dependencies-npm-cli dependencies-npm-jipt
+
+.PHONY: dependencies-npm-root
+dependencies-npm-root:
+	npm install
+
+.PHONY: dependencies-npm-webapp
+dependencies-npm-webapp:
 	npm install --prefix webapp
+
+.PHONY: dependencies-npm-cli
+dependencies-npm-cli:
+	npm install --prefix cli
+
+.PHONY: dependencies-npm-jipt
+dependencies-npm-jipt:
+	npm install --prefix jipt
 
 .PHONY: build
 build: ## Build the Docker image for the OTP release
-	docker build --build-arg APP_NAME=$(APP_NAME) --build-arg APP_VERSION=$(APP_VERSION) --rm --tag $(APP_NAME):$(DOCKER_IMAGE_TAG) .
+	docker build --rm --tag accent:$(DOCKER_IMAGE_TAG) .
+
+.PHONY: compose-build
+compose-build: ## Build the Docker image from the docker-compose.yml file
+	docker-compose build
 
 # CI targets
 # ----------
 
 .PHONY: lint
-lint: lint-compile lint-format lint-credo lint-eslint lint-stylelint lint-prettier ## Run lint tools on the code
+lint: lint-compile lint-format lint-credo lint-eslint lint-prettier lint-template-hbs ## Run lint tools on the code
 
 .PHONY: lint-compile
 lint-compile:
@@ -73,15 +87,20 @@ lint-credo:
 
 .PHONY: lint-eslint
 lint-eslint:
-	./assets/node_modules/.bin/eslint --ignore-path webapp/.eslintignore --config webapp/.eslintrc webapp
-
-.PHONY: lint-stylelint
-lint-stylelint:
-	./assets/node_modules/.bin/stylelint --syntax scss --config webapp/.stylelintrc webapp/css
+	npx eslint --ext .js,.ts ./webapp/app ./cli ./jipt
 
 .PHONY: lint-prettier
 lint-prettier:
-	./assets/node_modules/.bin/prettier --single-quote --list-different --no-bracket-spacing --print-width 130 './webapp/app/**/*.{js,gql}'
+	npx prettier --check './{webapp,jipt,cli}/!(node_modules)/**/*.{js,ts,json,svg,scss,md}' '*.md'
+
+.PHONY: lint-template-hbs
+lint-template-hbs:
+	npx ember-template-lint './webapp/app/**/*.hbs' --config-path './webapp/.template-lintrc'
+
+.PHONY: type-check
+type-check: ## Type-check typescript files
+	cd webapp && npx tsc
+	cd jipt && npx tsc
 
 .PHONY: test
 test: ## Run the test suite
@@ -100,7 +119,7 @@ format-elixir:
 
 .PHONY: format-prettier
 format-prettier:
-	./assets/node_modules/.bin/prettier --single-quote --write --no-bracket-spacing --print-width 130 './webapp/app/**/*.{js,gql}'
+	npx prettier --write --single-quote --no-bracket-spacing './{webapp,jipt,cli}/!(node_modules)/**/*.{js,ts,json,svg,scss,md}' '*.md'
 
 # Development targets
 # -------------------

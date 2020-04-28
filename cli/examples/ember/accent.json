@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "format": "json",
+      "source": "translations/fr.json",
+      "target": "translations/%slug%.json"
+    }
+  ]
+}

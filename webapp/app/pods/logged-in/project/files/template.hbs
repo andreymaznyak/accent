@@ -1,30 +1,26 @@
-{{page-title
-  text=(t 'pods.project.files.title')
-  icon='assets/file.svg'
-}}
-
-{{#if model.loading}}
-  {{skeleton-ui/progress-line}}
+{{#if this.model.loading}}
+  <SkeletonUi::ProgressLine />
 {{/if}}
 
-{{#if showSkeleton}}
-  {{skeleton-ui/documents-list}}
+{{#if this.showSkeleton}}
+  <SkeletonUi::DocumentsList />
 {{else}}
-  {{documents-list
-    permissions=permissions
-    documents=model.documents.entries
-    project=model.project
-    onDelete=(action 'deleteDocument')
-  }}
+  <DocumentsList
+    @permissions={{this.permissions}}
+    @documents={{this.model.documents.entries}}
+    @project={{this.model.project}}
+    @onDelete={{fn this.deleteDocument}}
+    @onUpdate={{fn this.updateDocument}}
+  />
 
-  {{#if (get permissions 'sync')}}
-    {{documents-add-button project=model.project}}
+  {{#if (get this.permissions "sync")}}
+    <DocumentsAddButton @project={{this.model.project}} />
   {{/if}}
 
-  {{resource-pagination
-    meta=model.documents.meta
-    onSelectPage=(action 'selectPage')
-  }}
+  <ResourcePagination
+    @meta={{this.model.documents.meta}}
+    @onSelectPage={{fn this.selectPage}}
+  />
 
   {{outlet}}
 {{/if}}

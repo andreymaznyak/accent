@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "format": "json",
+      "source": "aigu/*.json",
+      "target": "aigu/%document_path%-%slug%.json",
+      "hooks": {
+        "beforeSync": [
+          "rm -rf aigu",
+          "mkdir -p aigu",
+          "aigu rails-export --locale=en --output-file=aigu/aigu-is-awesome.json"
+        ],
+        "beforeAddTranslations": [
+          "aigu rails-export --locale=fr --output-file=aigu/aigu-is-awesome-fr.json"
+        ],
+        "beforeExport": ["mkdir -p aigu"],
+        "afterExport": [
+          "aigu rails-import --locale=en --input-file=aigu/aigu-is-awesome-en.json",
+          "aigu rails-import --locale=fr --input-file=aigu/aigu-is-awesome-fr.json"
+        ]
+      }
+    }
+  ]
+}

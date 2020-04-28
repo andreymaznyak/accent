@@ -2,10 +2,6 @@ defmodule Accent.Router do
   use Phoenix.Router
   use Sentry.Phoenix.Endpoint
 
-  if Mix.env() == :dev do
-    forward("/emails", Bamboo.EmailPreviewPlug)
-  end
-
   pipeline :graphql do
     plug(Accent.Plugs.AssignCurrentUser)
     plug(Accent.Plugs.SentryUserContext)
@@ -13,7 +9,11 @@ defmodule Accent.Router do
     plug(Accent.Plugs.GraphQLContext)
   end
 
-  forward("/graphiql", Absinthe.Plug.GraphiQL, schema: Accent.GraphQL.Schema)
+  scope "/graphiql" do
+    pipe_through(:graphql)
+
+    forward("/", Absinthe.Plug.GraphiQL, schema: Accent.GraphQL.Schema)
+  end
 
   scope "/graphql" do
     pipe_through(:graphql)
@@ -29,7 +29,7 @@ defmodule Accent.Router do
 
   pipeline :browser do
     plug :accepts, ~w(json html)
-    plug :put_secure_browser_headers
+    plug :put_secure_browser_headers, %{"x-frame-options" => ""}
   end
 
   scope "/", Accent do
@@ -44,16 +44,26 @@ defmodule Accent.Router do
 
     # File export
     get("/export", ExportController, [])
+    get("/jipt-export", ExportJIPTController, [])
+
+    post("/hooks/github", Hook.GitHubController, [], as: :hooks_github)
   end
 
   scope "/", Accent do
     # Users
-    post("/auth", AuthenticationController, :create)
+    # post("/auth", AuthenticationController, :create)
 
     get("/:id/percentage_reviewed_badge.svg", BadgeController, :percentage_reviewed_count)
     get("/:id/reviewed_badge.svg", BadgeController, :reviewed_count)
     get("/:id/conflicts_badge.svg", BadgeController, :conflicts_count)
     get("/:id/translations_badge.svg", BadgeController, :translations_count)
+  end
+
+  scope "/auth", Accent do
+    pipe_through [:browser]
+
+    get "/:provider", AuthController, :request
+    get "/:provider/callback", AuthController, :callback
   end
 
   scope "/", Accent do

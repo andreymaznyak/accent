@@ -1,29 +1,23 @@
-{{page-title
-  text=(t 'pods.project.versions.title')
-  icon='assets/tag.svg'
-}}
-
-{{#if model.loading}}
-  {{skeleton-ui/progress-line}}
+{{#if this.model.loading}}
+  <SkeletonUi::ProgressLine />
 {{/if}}
 
-{{#if showSkeleton}}
-  {{skeleton-ui/versions-list}}
+{{#if this.showSkeleton}}
+  <SkeletonUi::VersionsList />
 {{else}}
-  {{versions-list
-    permissions=permissions
-    versions=model.versions.entries
-    project=model.project
-  }}
+  <VersionsList
+    @permissions={{this.permissions}}
+    @versions={{this.model.versions.entries}}
+    @project={{this.model.project}}
+  />
 
-  {{#if (get permissions 'create_version')}}
-    {{versions-add-button project=model.project}}
+  {{#if (get this.permissions "create_version")}}
+    <VersionsAddButton @project={{this.model.project}} />
   {{/if}}
 
-  {{resource-pagination
-    meta=model.versions.meta
-    onSelectPage=(action 'selectPage')
-  }}
-
+  <ResourcePagination
+    @meta={{this.model.versions.meta}}
+    @onSelectPage={{fn this.selectPage}}
+  />
   {{outlet}}
 {{/if}}
